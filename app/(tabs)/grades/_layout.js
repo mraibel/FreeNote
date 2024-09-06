@@ -9,7 +9,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Notas',
-        }}></Stack.Screen>
+        }} 
+      />
+      <Stack.Screen
+        name="newSemester"
+        options={{
+          title: 'Inscribiendo ramos',
+        }}
+      />
     </Stack>
   );
 }

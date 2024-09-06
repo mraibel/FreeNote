@@ -8,9 +8,7 @@ export default function TabLayout() {
             <Tabs
                 initialRouteName="home"
                 screenOptions={{
-                    headerShown: false,
-                    tabBarStyle:{backgroundColor:'gray'}
-                    
+                    headerShown: false
                 }}
             >
                 <Tabs.Screen
@@ -18,25 +16,27 @@ export default function TabLayout() {
                     options={{
                         title: 'Inicio',
                         tabBarIcon: ({ focused }) => (
-                            <TabIconFontAwesome5 name={"home"} color={focused ? "white" : "black"}/>
+                            <TabIconFontAwesome5 name={"home"} color={focused ? "orange" : "black"}/>
                         )
                     }}
                 />
+
                 <Tabs.Screen
                     name="grades"
                     options={{
                         title: 'Notas',
                         tabBarIcon: ({ focused }) => (
-                            <TabIconCommunityIcons name={"notebook"} color={focused ? "white" : "black"}/>
+                            <TabIconCommunityIcons name={"notebook"} color={focused ? "orange" : "black"}/>
                         )
                     }}
                 />
+
                 <Tabs.Screen
                     name="calendar"
                     options={{
                         title: 'Calendario',
                         tabBarIcon: ({ focused }) => (
-                            <TabIconFontAwesome5 name={"calendar-alt"} color={focused ? "white" : "black"}/>
+                            <TabIconFontAwesome5 name={"calendar-alt"} color={focused ? "orange" : "black"}/>
                         )
                     }}
                 />
