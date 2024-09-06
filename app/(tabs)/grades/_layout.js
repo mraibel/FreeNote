@@ -21,7 +21,13 @@ export default function TabLayout() {
       <Stack.Screen
         name='semester/[id]'
         options={{
-          title:'Semestre'
+          title: 'Semestre'
+        }}
+      />
+      <Stack.Screen
+        name='semester/subject/[id]'
+        options={{
+          title: 'Asignatura'
         }}
       />
     </Stack>

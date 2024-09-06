@@ -37,13 +37,13 @@ export default function SemestreId() {
     return (
         <View style={styles.layout}>
             <View style={{ flex: 3 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal:15 }}>
                     <Text style={{ fontSize: 20 }}>Asignatura</Text>
                     <Text style={{ fontSize: 20 }}>Créditos</Text>
                 </View>
                 <FlatList
                     data={subjects}
-                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} />}
+                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id}/>}
                     keyExtractor={item => item.id}
                     ItemSeparatorComponent={() => <View style={{ borderWidth: 1 }} />}
                 />
@@ -68,10 +68,10 @@ const AverageCard = ({ average }) => {
     )
 }
 
-const SubjectCard = ({ name, credits }) => {
+const SubjectCard = ({ name, credits, id }) => {
 
     return (
-        <Link href={'/'} asChild>
+        <Link href={`/grades/semester/subject/${id}`} asChild>
             <Pressable>
                 <View style={styles.subjectCard}>
                     <Text numberOfLines={1} style={styles.subjectSubjectCard}>{name}</Text>
@@ -88,9 +88,7 @@ const styles = StyleSheet.create({
         padding: 10
     },
     subjectCard: {
-        width: 'full',
-        height: 50,
-        paddingVertical: 10,
+        padding: 20,
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
@@ -103,7 +101,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: 'center'
     },
-    averageCard:{ 
+    averageCard:{
         flexDirection: 'row', 
         alignItems: 'center', 
         gap: 10 
