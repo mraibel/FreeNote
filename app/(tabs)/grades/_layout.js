@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 
 export default function TabLayout() {
+
   return (
     <Stack
       screenOptions={{
@@ -9,12 +10,18 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Notas',
-        }} 
+        }}
       />
       <Stack.Screen
         name="newSemester"
         options={{
           title: 'Inscribiendo ramos',
+        }}
+      />
+      <Stack.Screen
+        name='semester/[id]'
+        options={{
+          title:'Semestre'
         }}
       />
     </Stack>

@@ -24,18 +24,18 @@ function OptionCard({ title, route }) {
 
     return (
         <Link href={route}>
-            <View style={styles.optionCardLayout}>
+            <GradientBackground style={styles.optionCardLayout} start={{ x: 0.3, y: 0.8 }} end={{ x: 0, y: 0 }} >
                 <Text style={styles.textOptionCard}>
                     {title}
                 </Text>
-            </View>
+            </GradientBackground>
         </Link>
     )
 }
 
 function WelcomeCard({ name }) {
     return (
-        <GradientBackground style={styles.welcomeCardLayout}>
+        <GradientBackground style={styles.welcomeCardLayout} start={{ x: 0.25, y: 0.25 }} end={{ x: 1, y: 0.75 }}>
             <View>
                 <Text style={styles.textWelcome}>
                     {`Bienvenido, ${name}`}
@@ -67,11 +67,10 @@ const styles = StyleSheet.create({
     },
     optionCardLayout: {
         padding: 10,
-        backgroundColor: 'red',
         alignItems: 'center',
         width: 250,
         height: 50,
-        borderBottomEndRadius: 15
+        borderBottomRightRadius:10
     },
     textOptionCard: {
         fontSize: 18
@@ -79,7 +78,7 @@ const styles = StyleSheet.create({
     welcomeCardLayout: {
         width: 300,
         height: 200,
-        borderRadius: 25,
+        borderRadius: 16,
         padding: 20,
         alignItems: 'center'
     },

@@ -1,19 +1,28 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View, StyleSheet } from "react-native";
+import { ActivityIndicator, Pressable, Text, View, StyleSheet, FlatList } from "react-native";
 import { getSemestersStudent } from "../../../lib/semesters";
 import { Link } from "expo-router";
+import GradientBackground from "../../../utils/GradientBackground";
 
 export default function Index() {
 
-    const [semesters, setSemesters] = useState(null)
+    //const [semesters, setSemesters] = useState(null)
 
     useEffect(() => {
-        getSemestersStudent(2).then((semesters) => {
-            setSemesters(semesters)
-            console.log(semesters)
+        /* getSemestersStudent(1).then((semesters) => {
+             setSemesters(semesters)
+             console.log(semesters)
         })
+        */
     }, [])
 
+    const semesters = [
+        { "id": 1, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
+        { "id": 2, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
+        { "id": 3, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
+        { "id": 4, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
+        { "id": 5, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
+    ]
 
     if (semesters == null) {
         return (
@@ -29,8 +38,10 @@ export default function Index() {
                 <Text style={styles.noSemesters}>No tienes semestres registrados</Text>
                 <Text style={styles.noSemesters}>Comenzemos a guardar tus notas!</Text>
                 <Link href={'/grades/newSemester'} asChild>
-                    <Pressable style={styles.buttonNoSemesters}>
-                        <Text>Crear semestre</Text>
+                    <Pressable>
+                        <GradientBackground style={styles.buttonNoSemesters} start={{ x: 0.5, y: 0.8 }} end={{ x: 0, y: 0 }} >
+                            <Text>Crear semestre</Text>
+                        </GradientBackground>
                     </Pressable>
                 </Link>
             </View>
@@ -39,17 +50,31 @@ export default function Index() {
 
     if (semesters.length > 0) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ flex: 1, alignItems: 'center', paddingVertical: 50 }}>
                 {
-                    semesters.map((e, index) => {
-                        return (
-                            <Text key={index}>{e.name}</Text>
-                        )
-                    })
+                    <FlatList
+                        data={semesters}
+                        renderItem={({ item }) => <SemesterCard name={item.name} id={item.id}/>}
+                        keyExtractor={item => item.id}
+                        ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                    />
                 }
             </View>
         )
     }
+}
+
+const SemesterCard = ({ name, id }) => {
+
+    return (
+        <Link href={`/grades/semester/${id}`} asChild>
+            <Pressable>
+                <GradientBackground style={styles.semesterCard}>
+                    <Text style={styles.textSemesterCard}> {name} </Text>
+                </GradientBackground>
+            </Pressable>
+        </Link>
+    )
 }
 
 const styles = StyleSheet.create({
@@ -59,12 +84,23 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     buttonNoSemesters: {
-        backgroundColor: 'red',
         padding: 10,
         marginTop: 20
     },
     textButtonNoSemesters: {
         fontSize: 15,
         fontWeight: 'semibold'
+    },
+    semesterCard: {
+        backgroundColor: 'red',
+        width: 300,
+        height: 70,
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 15
+    },
+    textSemesterCard: {
+        fontSize: 18,
     }
 })
