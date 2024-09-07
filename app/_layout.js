@@ -25,7 +25,10 @@ export default function layout() {
 
     return (
         <DataContext.Provider value={data}>
-            <Stack initialRouteName="index">
+            <Stack initialRouteName="login">
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="register" options={{ headerShown: false }} />
+                <Stack.Screen name="recoverPassword" options={{ headerShown: false }} />
                 <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             </Stack>
