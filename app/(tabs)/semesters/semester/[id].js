@@ -2,6 +2,7 @@ import { Link, useLocalSearchParams } from "expo-router"
 import { useContext, useEffect, useState } from "react"
 import { ActivityIndicator, Text, View, FlatList, StyleSheet, Pressable } from "react-native";
 import { DataContext } from "../../../_layout";
+import { semesterAverage } from '../../../../utils/semesterAverage'
 
 export default function SemestreId() {
 
@@ -37,7 +38,9 @@ export default function SemestreId() {
                 />
             </View>
             <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }}>
-                <AverageCard average={54.5} />
+                {
+                    subjects ? <AverageCard average={semesterAverage(subjects)} /> : <ActivityIndicator color={'orange'} />
+                }
             </View>
         </View>
     )

@@ -8,7 +8,8 @@ export default function TabLayout() {
             <Tabs
                 initialRouteName="home"
                 screenOptions={{
-                    headerShown: false
+                    headerShown: false,
+                    tabBarHideOnKeyboard:true
                 }}
             >
                 <Tabs.Screen

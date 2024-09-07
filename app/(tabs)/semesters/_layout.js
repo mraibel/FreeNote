@@ -9,7 +9,7 @@ export default function TabLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Notas',
+          title: 'Semestres',
         }}
       />
       <Stack.Screen

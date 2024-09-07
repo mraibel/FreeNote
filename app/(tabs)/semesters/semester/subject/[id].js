@@ -3,6 +3,8 @@ import { useContext, useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, View } from "react-native"
 import { getGradesSubjectId } from "../../../../../lib/subject"
 import { DataContext } from "../../../../_layout"
+import { Controller, useForm } from "react-hook-form";
+import { subjectAverage } from "../../../../../utils/subjectAverage"
 
 export default function SubjectId() {
 
@@ -10,10 +12,10 @@ export default function SubjectId() {
     const [subject, setSubject] = useState(null)
 
     const data = useContext(DataContext)
-
+    
     useEffect(() => {
         setSubject(data.semesters.find((e) => e.id == idSemester).subjects.find((e) => e.id == id))
-    }, [])
+    }, [] )
 
     if (subject === null) {
         return (
@@ -23,23 +25,27 @@ export default function SubjectId() {
         )
     }
 
-    if(subject.grades > 0) {
-        return(
-            <>
-            </>
-        )
-    }
-
     return (
         <View style={{ flex: 1, margin: 20 }}>
-            <Text style={{ textAlign: 'center', fontSize: 25 }}>{subject.name}</Text>
-            <View style={{ margin: 20 }}>
-                <FlatList
-                    data={subject.grades}
-                    renderItem={({ item }) => <GradeCard item={item} />}
-                    keyExtractor={item => item.id}
-                    ItemSeparatorComponent={() => <View style={{ borderWidth: 0.2, marginVertical: 15 }} />}
-                />
+            <View style={{flex:10}}>
+                <Text style={{ textAlign: 'center', fontSize: 25 }}>{subject.name}</Text>
+                <View style={{ margin: 20 }}>
+                    <FlatList
+                        data={subject.grades}
+                        renderItem={({ item }) => <GradeCard item={item} />}
+                        keyExtractor={item => item.id}
+                        ItemSeparatorComponent={() => <View style={{ borderWidth: 0.2, marginVertical: 15 }} />}
+                    />
+                </View>
+            </View>
+            <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:20}}>
+                <Text style={{fontSize:22}}>Promedio</Text>
+                {
+                    subject ? 
+                        <View 
+                            style={styles.squareAverageCard}><Text>{subjectAverage(subject.grades)}</Text></View> 
+                            : <ActivityIndicator color={'orange'}/>
+                }
             </View>
         </View>
     )
@@ -48,16 +54,48 @@ export default function SubjectId() {
 const GradeCard = ({ item }) => {
 
     const { description, percentage, value, subgrades } = item
+    const { control, handleSubmit, setValue } = useForm({
+        defaultValues: {
+            percentage: percentage || '',
+            value: value || ''
+        }
+    });
 
     return (
         <View>
             <View style={styles.mainGradeCard}>
                 <View style={styles.descriptionGradeCard}>
                     <Text style={styles.fontSizeCard}>{description}</Text>
-                    <TextInput style={styles.input} value={percentage} keyboardType="numeric" placeholder="%" />
+                    <Controller
+                        control={control}
+                        name={`grades[${item.id}].percentage`}
+                        defaultValue={percentage || 0}
+                        render={({ field: { onChange, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                value={String(value)}
+                                keyboardType="numeric"
+                                placeholder="%"
+                                onChangeText={onChange}
+                            />
+                        )}
+                    />
                 </View>
                 <View style={styles.valueGradeCard}>
-                    <TextInput style={styles.input} value={value} keyboardType="numeric" />
+                    <Controller
+                        control={control}
+                        name={`grades[${item.id}].value`}
+                        defaultValue={value || 0}
+                        render={({ field: { onChange, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                value={String(value)}
+                                keyboardType="numeric"
+                                placeholder="%"
+                                onChangeText={onChange}
+                            />
+                        )}
+                    />
                 </View>
             </View>
             <FlatList
@@ -73,15 +111,46 @@ const GradeCard = ({ item }) => {
 const SubGradeCard = ({ item }) => {
 
     const { description, percentage, value } = item
+    const { control, handleSubmit, setValue } = useForm({
+        defaultValues: {
+            percentage: percentage || '',
+            value: value || ''
+        }
+    });
 
     return (
         <View style={styles.subgradeCard}>
             <View style={styles.descriptionSubGradeCard}>
                 <Text style={styles.fontSizeCard}>{description}</Text>
-                <TextInput style={styles.input} value={percentage || 0} keyboardType="numeric" placeholder="%"  />
+                <Controller
+                    control={control}
+                    name={`subgrades[${item.id}].percentage`}
+                    defaultValue={percentage || 0}
+                    render={({ field: { onChange, value } }) => (
+                        <TextInput
+                            style={styles.input}
+                            value={String(value)}
+                            keyboardType="numeric"
+                            placeholder="%"
+                            onChangeText={onChange}
+                        />
+                    )}
+                />
             </View>
             <View style={styles.valueGradeCard}>
-                <TextInput style={styles.input} value={value || 0} keyboardType="numeric" />
+                <Controller
+                    control={control}
+                    name={`subgrades[${item.id}].value`}
+                    defaultValue={value || 0}
+                    render={({ field: { onChange, value } }) => (
+                        <TextInput
+                            style={styles.input}
+                            value={String(value)}
+                            keyboardType="numeric"
+                            onChangeText={onChange}
+                        />
+                    )}
+                />
             </View>
         </View>
     )
@@ -95,6 +164,7 @@ const styles = StyleSheet.create({
     descriptionGradeCard: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         flex: 3
     },
     valueGradeCard: {
@@ -114,11 +184,21 @@ const styles = StyleSheet.create({
     descriptionSubGradeCard: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         flex: 3,
         marginLeft: 20
     },
     fontSizeCard: {
         fontSize: 17
+    },
+    squareAverageCard: {
+        padding: 5,
+        borderWidth: 1,
+        borderColor: 'gray',
+        width: 75,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 
 })
