@@ -1,30 +1,18 @@
 import { Link, useLocalSearchParams } from "expo-router"
-import { useEffect, useState } from "react"
-import { getSemesterId } from "../../../../lib/semesters";
+import { useContext, useEffect, useState } from "react"
 import { ActivityIndicator, Text, View, FlatList, StyleSheet, Pressable } from "react-native";
+import { DataContext } from "../../../_layout";
 
 export default function SemestreId() {
 
-    // const { id } = useLocalSearchParams()
-    // const [semester, setSemester] = useState(null)
+    const { id } = useLocalSearchParams()
+    const [subjects, setSubjects] = useState(null)
+
+    const data = useContext(DataContext)
 
     useEffect(() => {
-        /*
-        getSemesterId(id).then((semester) => {
-            setSemester(semester)
-        })
-        */
+        setSubjects(data.semesters.find((e) => e.id == id).subjects)
     }, [])
-
-
-    subjects = [
-        { "id": 1, "name": "Formulación y Evaluación de Proyectos", "credits": 4, "id_semester": 1 },
-        { "id": 2, "name": "Legislación", "credits": 3, "id_semester": 1 },
-        { "id": 3, "name": "Sistemas Operativos", "credits": 6, "id_semester": 1 },
-        { "id": 4, "name": "Inteligencia Artificial", "credits": 4, "id_semester": 1 },
-        { "id": 5, "name": "Ingeniería de Software", "credits": 5, "id_semester": 1 },
-        { "id": 6, "name": "Práctica Profesional 2", "credits": 9, "id_semester": 1 }
-    ]
 
     if (subjects === null) {
         return (
@@ -37,13 +25,13 @@ export default function SemestreId() {
     return (
         <View style={styles.layout}>
             <View style={{ flex: 3 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal:15 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15 }}>
                     <Text style={{ fontSize: 20 }}>Asignatura</Text>
                     <Text style={{ fontSize: 20 }}>Créditos</Text>
                 </View>
                 <FlatList
                     data={subjects}
-                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id}/>}
+                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id} idSemester={id} />}
                     keyExtractor={item => item.id}
                     ItemSeparatorComponent={() => <View style={{ borderWidth: 1 }} />}
                 />
@@ -57,6 +45,28 @@ export default function SemestreId() {
 
 }
 
+const SubjectCard = ({ name, credits, id, idSemester }) => {
+
+    return (
+        <Link
+            href={{
+                pathname:`/semesters/semester/subject/${id}`,
+                params: { 
+                    idSemester: idSemester,
+                }
+            }}
+            asChild
+        >
+            <Pressable>
+                <View style={styles.subjectCard}>
+                    <Text numberOfLines={1} style={styles.subjectSubjectCard}>{name}</Text>
+                    <Text style={styles.creditsSubjectCard}>{credits}</Text>
+                </View>
+            </Pressable>
+        </Link>
+    )
+}
+
 const AverageCard = ({ average }) => {
     return (
         <View style={styles.averageCard}>
@@ -65,20 +75,6 @@ const AverageCard = ({ average }) => {
                 <Text>{average}</Text>
             </View>
         </View>
-    )
-}
-
-const SubjectCard = ({ name, credits, id }) => {
-
-    return (
-        <Link href={`/grades/semester/subject/${id}`} asChild>
-            <Pressable>
-                <View style={styles.subjectCard}>
-                    <Text numberOfLines={1} style={styles.subjectSubjectCard}>{name}</Text>
-                    <Text style={styles.creditsSubjectCard}>{credits}</Text>
-                </View>
-            </Pressable>
-        </Link>
     )
 }
 
@@ -101,19 +97,19 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: 'center'
     },
-    averageCard:{
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 10 
+    averageCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10
     },
-    squareAverageCard:{ 
-        padding: 5, 
-        borderWidth: 1, 
-        borderColor: 'gray', 
-        width: 75, 
-        height: 50, 
-        justifyContent: 'center', 
-        alignItems: 'center' 
+    squareAverageCard: {
+        padding: 5,
+        borderWidth: 1,
+        borderColor: 'gray',
+        width: 75,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
 

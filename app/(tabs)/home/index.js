@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { View, StyleSheet, Text, Image, Button, Pressable } from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 import GradientBackground from "../../../utils/GradientBackground";
 
 export default function Home() {
@@ -10,8 +10,8 @@ export default function Home() {
         <View style={styles.layout}>
             <WelcomeCard name={userName} />
             <View style={{ flex: 2, paddingTop: 70, gap: 15 }}>
-                <OptionCard title={'Último semestre visto'} route={'../grades'} />
-                <OptionCard title={'Ver mis semestres'} route={'../grades'} />
+                <OptionCard title={'Último semestre visto'} route={'../semesters'} />
+                <OptionCard title={'Ver mis semestres'} route={'../semesters'} />
             </View>
             <View style={{ flex: 1 }}>
                 <FastCalendar />

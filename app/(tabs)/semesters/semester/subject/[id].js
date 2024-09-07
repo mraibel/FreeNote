@@ -1,75 +1,32 @@
 import { useLocalSearchParams } from "expo-router"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, View } from "react-native"
 import { getGradesSubjectId } from "../../../../../lib/subject"
+import { DataContext } from "../../../../_layout"
 
 export default function SubjectId() {
 
-    const { id } = useLocalSearchParams()
-    // const [subject, setGrades] = useState(null)
+    const { id, idSemester } = useLocalSearchParams()
+    const [subject, setSubject] = useState(null)
+
+    const data = useContext(DataContext)
 
     useEffect(() => {
-        /*
-        getGradesSubjectId(id).then((subject) => {
-            setGrades(subject)
-            console.log(subject)
-        })
-        */
+        setSubject(data.semesters.find((e) => e.id == idSemester).subjects.find((e) => e.id == id))
     }, [])
-
-    const subject = {
-        "id": 1,
-        "name": "Formulación y Evaluación de Proyectos",
-        "credits": 4,
-        "id_semester": 1,
-        "grades": [
-            {
-                "id": 2,
-                "value": null,
-                "description": "Contoles",
-                "percentage": 30,
-                "id_subject": 1,
-                "subgrades": [
-                    {
-                        "id": 1,
-                        "value": null,
-                        "description": "Control 1",
-                        "percentage": 50,
-                        "id_grade": 2
-                    },
-                    {
-                        "id": 2,
-                        "value": null,
-                        "description": "Control 2",
-                        "percentage": 50,
-                        "id_grade": 2
-                    }
-                ]
-            },
-            {
-                "id": 1,
-                "value": null,
-                "description": "Parcial 1",
-                "percentage": 30,
-                "id_subject": 1,
-                "subgrades": []
-            },
-            {
-                "id": 3,
-                "value": null,
-                "description": "Parcial 3",
-                "percentage": 40,
-                "id_subject": 1,
-                "subgrades": []
-            }
-        ]
-    }
 
     if (subject === null) {
         return (
             <View style={{ flex: 1, justifyContent: 'center' }}>
                 <ActivityIndicator size={100} color={'orange'} />
             </View>
+        )
+    }
+
+    if(subject.grades > 0) {
+        return(
+            <>
+            </>
         )
     }
 
@@ -97,10 +54,10 @@ const GradeCard = ({ item }) => {
             <View style={styles.mainGradeCard}>
                 <View style={styles.descriptionGradeCard}>
                     <Text style={styles.fontSizeCard}>{description}</Text>
-                    <TextInput style={styles.input} value={percentage || 0} keyboardType="numeric" placeholder="%" />
+                    <TextInput style={styles.input} value={percentage} keyboardType="numeric" placeholder="%" />
                 </View>
                 <View style={styles.valueGradeCard}>
-                    <TextInput style={styles.input} value={value || 0} keyboardType="numeric" />
+                    <TextInput style={styles.input} value={value} keyboardType="numeric" />
                 </View>
             </View>
             <FlatList

@@ -22,9 +22,9 @@ export default function TabLayout() {
                 />
 
                 <Tabs.Screen
-                    name="grades"
+                    name="semesters"
                     options={{
-                        title: 'Notas',
+                        title: 'Semestres',
                         tabBarIcon: ({ focused }) => (
                             <TabIconCommunityIcons name={"notebook"} color={focused ? "orange" : "black"}/>
                         )

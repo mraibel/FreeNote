@@ -1,28 +1,20 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View, StyleSheet, FlatList } from "react-native";
 import { getSemestersStudent } from "../../../lib/semesters";
 import { Link } from "expo-router";
 import GradientBackground from "../../../utils/GradientBackground";
+import { DataContext } from "../../_layout";
+
 
 export default function Index() {
 
-    //const [semesters, setSemesters] = useState(null)
+    const [semesters, setSemesters] = useState(null)
 
+    const data = useContext(DataContext)
+    
     useEffect(() => {
-        /* getSemestersStudent(1).then((semesters) => {
-             setSemesters(semesters)
-             console.log(semesters)
-        })
-        */
+        setSemesters(data.semesters)
     }, [])
-
-    const semesters = [
-        { "id": 1, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
-        { "id": 2, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
-        { "id": 3, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
-        { "id": 4, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
-        { "id": 5, "id_student": 1, "name": "Semestre maldito 123 pro xd" },
-    ]
 
     if (semesters == null) {
         return (
@@ -65,9 +57,8 @@ export default function Index() {
 }
 
 const SemesterCard = ({ name, id }) => {
-
     return (
-        <Link href={`/grades/semester/${id}`} asChild>
+        <Link href={`/semesters/semester/${id}`} asChild>
             <Pressable>
                 <GradientBackground style={styles.semesterCard}>
                     <Text style={styles.textSemesterCard}> {name} </Text>
