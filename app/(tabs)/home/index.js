@@ -1,14 +1,28 @@
-import { Link } from "expo-router";
-import { View, StyleSheet, Text, Image } from "react-native";
-import GradientBackground from "../../../utils/GradientBackground";
+import { Link, useRouter } from "expo-router";
+import { View, StyleSheet, Text, Image, Button } from "react-native";
+import GradientBackground from "../../../components/GradienteBackground/GradientBackground";
+import { useData } from "../../../components/Data/DataContext";
+import { ActivityIndicator } from "react-native-paper";
+import { useAuth } from "../../../components/Auth/AuthContext";
 
 export default function Home() {
 
-    const userName = 'Mi Shangrila'
+    const { logout, setAuthState } = useAuth()
+    const router = useRouter()
+
+    const { data } = useData()
+
+    if(!data) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+                <ActivityIndicator size={100} color={'orange'} />
+            </View>
+        )
+    }
 
     return (
         <View style={styles.layout}>
-            <WelcomeCard name={userName} />
+            <WelcomeCard name={data.name} />
             <View style={{ flex: 2, paddingTop: 70, gap: 15 }}>
                 <OptionCard title={'Último semestre visto'} route={'../semesters'} />
                 <OptionCard title={'Ver mis semestres'} route={'../semesters'} />
@@ -16,6 +30,11 @@ export default function Home() {
             <View style={{ flex: 1 }}>
                 <FastCalendar />
             </View>
+            <Button title="salirse" onPress={() => {
+                logout(setAuthState).then(()=> {
+                    router.navigate('/login')
+                })
+            }}/>
         </View>
     )
 }

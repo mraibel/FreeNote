@@ -3,16 +3,29 @@ import { View, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useForm, useController } from 'react-hook-form';
 import { TextInput, Button } from 'react-native-paper';
-import { Link } from 'expo-router';
-import { login } from '../lib/sesion';
+import { Link, useRouter } from 'expo-router';
+import { useAuth } from '../components/Auth/AuthContext';
 
 export default function Login() {
+
+    const router = useRouter()
+
+    const { login, setAuthState, authState } = useAuth()
 
     const { control, handleSubmit, formState: { errors }, setValue } = useForm()
 
     const onSubmit = (data) => {
-        login(data).then((student) => {
-            console.log(student)
+        login(data).then((data) => {
+            console.log(data)
+            setAuthState({
+                token: data.token,
+                authenticated: true,
+                idStudent: data.student.id
+            })
+        }).then(() => {
+            setValue('email', '')
+            setValue('password', '')
+            router.navigate('/home')
         })
     }
 

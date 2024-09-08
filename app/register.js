@@ -3,15 +3,34 @@ import { View, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useForm, useController } from 'react-hook-form';
 import { TextInput, Button } from 'react-native-paper';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+import { useAuth } from '../components/Auth/AuthContext';
 
 export default function Register() {
+
+    const router = useRouter()
+
+    const { register, setAuthState } = useAuth()
 
     const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm()
     const password = watch('password');
 
     const onSubmit = (data) => {
-        console.log(data)
+        register(data).then((data) => {
+            console.log(data)
+            setAuthState({
+                token: data.token,
+                authenticated: true,
+                idStudent: data.student.id
+            })
+        }).then(() => {
+            router.navigate('/home')
+            setValue('name', '')
+            setValue('lastName', '')
+            setValue('email', '')
+            setValue('password', '')
+            setValue('repeatPassword', '')
+        })
     }
 
     return (
@@ -31,6 +50,20 @@ export default function Register() {
                 {/* Caja de inicio de sesión */}
                 <View style={styles.loginBox}>
                     <Text style={styles.title}>Registro</Text>
+                    <Input
+                        name={'name'}
+                        control={control}
+                        placeholder={'Nombre'}
+                        password={false}
+                        errors={errors.name}
+                    />
+                    <Input
+                        name={'lastName'}
+                        control={control}
+                        placeholder={'Apellido'}
+                        password={false}
+                        errors={errors.lastName}
+                    />
                     <Input
                         name={'email'}
                         control={control}

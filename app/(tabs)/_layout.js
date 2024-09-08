@@ -1,8 +1,18 @@
 import { Tabs } from "expo-router";
 import { View } from "react-native";
 import { TabIconFontAwesome5, TabIconCommunityIcons } from "../../components/icons/TabIcon";
+import { DataProvider } from "../../components/Data/DataContext";
 
-export default function TabLayout() {
+
+export default function layout() {
+    return (
+        <DataProvider>
+            <TabLayout/>        
+        </DataProvider>
+    )
+}
+
+function TabLayout() {
     return (
         <View style={{ flex:1 }}>
             <Tabs
