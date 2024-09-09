@@ -1,15 +1,15 @@
 import { Link, useLocalSearchParams } from "expo-router"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { ActivityIndicator, Text, View, FlatList, StyleSheet, Pressable } from "react-native";
-import { DataContext } from "../../../_layout";
 import { semesterAverage } from '../../../../utils/semesterAverage'
+import { useData } from "../../../../components/Data/DataContext";
 
 export default function SemestreId() {
 
     const { id } = useLocalSearchParams()
     const [subjects, setSubjects] = useState(null)
 
-    const data = useContext(DataContext)
+    const { data } = useData()
 
     useEffect(() => {
         setSubjects(data.semesters.find((e) => e.id == id).subjects)

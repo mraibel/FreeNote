@@ -1,16 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View, StyleSheet, FlatList } from "react-native";
-import { getSemestersStudent } from "../../../lib/semesters";
 import { Link } from "expo-router";
 import GradientBackground from "../../../components/GradienteBackground/GradientBackground";
-import { DataContext } from "../../_layout";
-
+import { useData } from "../../../components/Data/DataContext";
 
 export default function Index() {
 
     const [semesters, setSemesters] = useState(null)
 
-    const data = useContext(DataContext)
+    const { data } = useData()
     
     useEffect(() => {
         setSemesters(data.semesters)

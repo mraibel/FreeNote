@@ -1,17 +1,16 @@
 import { useLocalSearchParams } from "expo-router"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, View } from "react-native"
-import { getGradesSubjectId } from "../../../../../lib/subject"
-import { DataContext } from "../../../../_layout"
 import { Controller, useForm } from "react-hook-form";
 import { subjectAverage } from "../../../../../utils/subjectAverage"
+import { useData } from "../../../../../components/Data/DataContext"
 
 export default function SubjectId() {
 
     const { id, idSemester } = useLocalSearchParams()
     const [subject, setSubject] = useState(null)
 
-    const data = useContext(DataContext)
+    const { data } = useData()
     
     useEffect(() => {
         setSubject(data.semesters.find((e) => e.id == idSemester).subjects.find((e) => e.id == id))
