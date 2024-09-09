@@ -15,6 +15,7 @@ export default function Login() {
     const { control, handleSubmit, formState: { errors }, setValue } = useForm()
 
     const onSubmit = (data) => {
+        console.log('a')
         login(data).then((data) => {
             console.log(data)
             setAuthState({

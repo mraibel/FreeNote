@@ -12,16 +12,6 @@ export const DataProvider = ({ children }) => {
     
     const [data, setData] = useState(null)
 
-    const { authState } = useAuth()
-
-    useEffect(() => {
-        if(authState.idStudent) {
-            getAllDataById(authState.idStudent).then((data) => {
-                setData(data)
-            })
-        }
-    }, [])
-
     const value = {
         data,
         setData

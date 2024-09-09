@@ -4,19 +4,40 @@ import GradientBackground from "../../../components/GradienteBackground/Gradient
 import { useData } from "../../../components/Data/DataContext";
 import { ActivityIndicator } from "react-native-paper";
 import { useAuth } from "../../../components/Auth/AuthContext";
+import { useEffect } from "react";
+import { getAllDataById } from "../../../components/Data/data";
+import { getItem } from "../../../utils/SecureStore/secureStore";
 
 export default function Home() {
 
-    const { logout, setAuthState } = useAuth()
+    const { logout, setAuthState, authState } = useAuth()
     const router = useRouter()
 
-    const { data } = useData()
+    const { data, setData } = useData()
 
-    if(!data) {
+    useEffect(() => {
+        getItem('id').then((id) => {
+            const idParse = parseInt(id)
+            console.log('home')
+            getAllDataById(idParse).then((data) => {
+                setData(data)
+            }) 
+        })
+    }, [])
+
+    if (data == null) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-                <ActivityIndicator size={100} color={'orange'} />
-            </View>
+            <>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <ActivityIndicator size={100} color={'orange'} />
+                </View>
+                <Button title="salirse" onPress={() => {
+                    logout(setAuthState).then(() => {
+                        router.navigate('/login')
+                    })
+                }} />
+            </>
+
         )
     }
 
@@ -31,10 +52,10 @@ export default function Home() {
                 <FastCalendar />
             </View>
             <Button title="salirse" onPress={() => {
-                logout(setAuthState).then(()=> {
+                logout(setAuthState).then(() => {
                     router.navigate('/login')
                 })
-            }}/>
+            }} />
         </View>
     )
 }
@@ -89,7 +110,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: 250,
         height: 50,
-        borderBottomRightRadius:10
+        borderBottomRightRadius: 10
     },
     textOptionCard: {
         fontSize: 18
