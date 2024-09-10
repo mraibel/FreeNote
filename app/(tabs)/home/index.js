@@ -31,13 +31,7 @@ export default function Home() {
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <ActivityIndicator size={100} color={'orange'} />
                 </View>
-                <Button title="salirse" onPress={() => {
-                    logout(setAuthState).then(() => {
-                        router.navigate('/login')
-                    })
-                }} />
             </>
-
         )
     }
 

@@ -1,6 +1,6 @@
 import { useState, useContext, createContext, useEffect } from "react"
 import { getItem } from "../../utils/SecureStore/secureStore"
-import { login, register, logout } from "./sesion"
+import { login, register, registerRequest, logout } from "./sesion"
 
 const AuthContext = createContext({})
 
@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         login,
         register,
+        registerRequest,
         logout,
         authState,
         setAuthState

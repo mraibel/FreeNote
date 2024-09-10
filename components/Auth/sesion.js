@@ -9,12 +9,21 @@ export const login = async (user) => {
         body: JSON.stringify(user),
     });
     const data = await response.json();
-    console.log('aa')
 
     await setItem('token', data.token)
-    console.log('aaa')
     await setItem('id', data.student.id.toString())
-    console.log('aaaa')
+    return data
+}
+
+export const registerRequest = async (user) => {
+    const response = await fetch(`${process.env.ROUTE_API}/api/sesion/requestRegistation/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+    })
+    const data = await response.json()
     return data
 }
 
@@ -27,8 +36,9 @@ export const register = async (user) => {
         body: JSON.stringify(user),
     })
     const data = await response.json()
+    
     await setItem('token', data.token)
-    await setItem('id', data.student.id)
+    await setItem('id', data.student.id.toString())
     return data
 }
 

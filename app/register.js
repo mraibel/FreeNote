@@ -2,35 +2,55 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useForm, useController } from 'react-hook-form';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, Modal, Portal } from 'react-native-paper';
 import { Link, useRouter } from 'expo-router';
 import { useAuth } from '../components/Auth/AuthContext';
+
 
 export default function Register() {
 
     const router = useRouter()
 
-    const { register, setAuthState } = useAuth()
+    // register
+    const { register, setAuthState, registerRequest } = useAuth()
+    const [dataRegister, setDataRegister] = useState()
+    const [code, setCode] = useState()
 
-    const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm()
+    const { control, handleSubmit, formState: { errors }, watch } = useForm({})
     const password = watch('password');
 
     const onSubmit = (data) => {
-        register(data).then((data) => {
-            console.log(data)
-            setAuthState({
-                token: data.token,
-                authenticated: true,
-                idStudent: data.student.id
-            })
-        }).then(() => {
-            router.navigate('/home')
-            setValue('name', '')
-            setValue('lastName', '')
-            setValue('email', '')
-            setValue('password', '')
-            setValue('repeatPassword', '')
+        registerRequest(data).then((data) => {
+            setDataRegister(data.newUser)
+            setCode(data.code)
+            showModal()
         })
+    }
+
+    //Modal
+    const [visible, setVisible] = useState(false);
+    const showModal = () => setVisible(true);
+    const hideModal = () => setVisible(false);
+    const containerStyle = { backgroundColor: 'white', padding: 20, margin: 20 };
+    const [codeUser, setCodeUser] = useState('')
+
+    //Confirm account
+    const confirmAccount = () => {
+        if (code == codeUser) {
+            register(dataRegister).then((data) => {
+                setAuthState({
+                    token: data.token,
+                    authenticated: true,
+                    idStudent: data.student.id
+                })
+            }).then(() => {
+                control._reset()
+                hideModal()
+                router.navigate('/home')
+            })
+        } else {
+            console.log('mal')
+        }
     }
 
     return (
@@ -88,7 +108,7 @@ export default function Register() {
                         }}
                     />
                     <Button mode='contained' onPress={handleSubmit(onSubmit)} style={styles.loginButton} >
-                        Iniciar sesión
+                        Registrarse
                     </Button>
                     <Link href={'/login'} asChild >
                         <Text style={styles.signupText}>
@@ -96,9 +116,39 @@ export default function Register() {
                         </Text>
                     </Link>
                 </View>
+                <ModalCode
+                    visible={visible}
+                    dataRegister={dataRegister}
+                    hideModal={hideModal}
+                    containerStyle={containerStyle}
+                    codeUser={codeUser}
+                    setCodeUser={setCodeUser}
+                    confirmAccount={confirmAccount}
+                />
             </LinearGradient>
         </View>
     );
+}
+
+function ModalCode({ visible, dataRegister, hideModal, containerStyle, setCodeUser, codeUser, confirmAccount }) {
+    return (
+        <Portal>
+            <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+                <Text style={{ fontSize: 20 }}>Hola!, {dataRegister?.name}</Text>
+                <Text style={{ fontSize: 15 }}>Debes ingresar el código que se te envió al correo para confirmar la cuenta</Text>
+                <TextInput
+                    value={codeUser}
+                    onChangeText={setCodeUser}
+                    mode='outlined'
+                    style={styles.input}
+                    label={'Ingrese código'}
+                />
+                <Button mode='contained' style={styles.loginButton} onPress={confirmAccount} >
+                    Confirmar cuenta
+                </Button>
+            </Modal>
+        </Portal>
+    )
 }
 
 function Input({ name, control, placeholder, password, errors, validate }) {

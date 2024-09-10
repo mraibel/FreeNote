@@ -54,7 +54,7 @@ export default function Login() {
                     </Button>
                     <Link href={'/register'} asChild>
                         <Text style={styles.signupText}>
-                            ¿Ya tienes cuenta? Regístrate
+                            ¿No tienes cuenta? Regístrate
                         </Text>
                     </Link>
                     <Link href={'/recoverPassword'} asChild >
