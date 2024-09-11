@@ -50,6 +50,7 @@ export default function Register() {
             })
         } else {
             console.log('mal')
+            alert("Debes ingresar bien el codigo")
         }
     }
 

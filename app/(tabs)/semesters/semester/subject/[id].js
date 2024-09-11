@@ -10,10 +10,11 @@ export default function SubjectId() {
     const { id, idSemester } = useLocalSearchParams()
     const [subject, setSubject] = useState(null)
 
-    const { data } = useData()
+    const { currentSubject } = useData()
     
     useEffect(() => {
-        setSubject(data.semesters.find((e) => e.id == idSemester).subjects.find((e) => e.id == id))
+        console.log(id, idSemester)
+        setSubject(currentSubject)
     }, [] )
 
     if (subject === null) {
@@ -37,15 +38,19 @@ export default function SubjectId() {
                     />
                 </View>
             </View>
-            <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:20}}>
-                <Text style={{fontSize:22}}>Promedio</Text>
-                {
-                    subject ? 
-                        <View 
-                            style={styles.squareAverageCard}><Text>{subjectAverage(subject.grades)}</Text></View> 
-                            : <ActivityIndicator color={'orange'}/>
-                }
-            </View>
+            {
+                subject.grades.length > 0 ? (
+                    <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:20}}>
+                    <Text style={{fontSize:22}}>Promedio</Text>
+                    {
+                        subject ? 
+                            <View 
+                                style={styles.squareAverageCard}><Text>{subjectAverage(subject.grades)}</Text></View> 
+                                : <ActivityIndicator color={'orange'}/>
+                    }
+                </View>
+                ) : ''
+            }
         </View>
     )
 }

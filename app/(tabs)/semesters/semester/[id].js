@@ -1,18 +1,18 @@
-import { Link, useLocalSearchParams } from "expo-router"
+import { Link } from "expo-router"
 import { useEffect, useState } from "react"
-import { ActivityIndicator, Text, View, FlatList, StyleSheet, Pressable } from "react-native";
+import { ActivityIndicator, Text, View, FlatList, StyleSheet } from "react-native";
 import { semesterAverage } from '../../../../utils/semesterAverage'
 import { useData } from "../../../../components/Data/DataContext";
+import { Card, Button, IconButton } from "react-native-paper";
 
 export default function SemestreId() {
 
-    const { id } = useLocalSearchParams()
-    const [subjects, setSubjects] = useState(null)
-
-    const { data } = useData()
+    // Data
+    const [ subjects, setSubjects ] = useState(null)
+    const { currentSemester, setCurrentSubject } = useData()
 
     useEffect(() => {
-        setSubjects(data.semesters.find((e) => e.id == id).subjects)
+        setSubjects(currentSemester.subjects)
     }, [])
 
     if (subjects === null) {
@@ -25,48 +25,56 @@ export default function SemestreId() {
 
     return (
         <View style={styles.layout}>
-            <View style={{ flex: 3 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15 }}>
-                    <Text style={{ fontSize: 20 }}>Asignatura</Text>
-                    <Text style={{ fontSize: 20 }}>Créditos</Text>
-                </View>
+            <View style={{ flex: 7, padding: 20 }}>
                 <FlatList
                     data={subjects}
-                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id} idSemester={id} />}
+                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id} setSubject={setCurrentSubject} subject={item}/>}
                     keyExtractor={item => item.id}
-                    ItemSeparatorComponent={() => <View style={{ borderWidth: 1 }} />}
                 />
             </View>
-            <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }}>
-                {
-                    subjects ? <AverageCard average={semesterAverage(subjects)} /> : <ActivityIndicator color={'orange'} />
-                }
-            </View>
+            {
+                subjects.length > 0 ? (
+                    <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:20}}>
+                    {
+                        subjects ? <AverageCard average={semesterAverage(subjects)} /> : <ActivityIndicator color={'orange'} />
+                    }
+                </View>
+                ) : ''
+            }
         </View>
     )
-
-
 }
 
-const SubjectCard = ({ name, credits, id, idSemester }) => {
+const SubjectCard = ({ name, credits, id, setSubject, subject }) => {
+
+    function setCurrentSubject() {
+        setSubject(subject)
+    }
 
     return (
-        <Link
-            href={{
-                pathname:`/semesters/semester/subject/${id}`,
-                params: { 
-                    idSemester: idSemester,
-                }
-            }}
-            asChild
-        >
-            <Pressable>
-                <View style={styles.subjectCard}>
-                    <Text numberOfLines={1} style={styles.subjectSubjectCard}>{name}</Text>
-                    <Text style={styles.creditsSubjectCard}>{credits}</Text>
+        <Card style={styles.subjectCard}>
+            <Card.Content>
+                <View style={styles.subjectContent}>
+                    <Text numberOfLines={1} style={styles.subjectText}>{name}</Text>
+                    <Text style={styles.subjectCode}>{credits}</Text>
                 </View>
-            </Pressable>
-        </Link>
+            </Card.Content>
+            <Card.Actions>
+                <Link
+                    href={`/semesters/semester/subject/${id}`}
+                    asChild
+                    onPress={setCurrentSubject}
+                >
+                    <Button>
+                        Ver Detalles
+                    </Button>
+                </Link>
+                <IconButton
+                    icon="calendar"
+                    onPress={() => {/* Acción para agregar un evento de la asignatura */ }}
+                />
+            </Card.Actions>
+        </Card>
     )
 }
 
@@ -87,18 +95,22 @@ const styles = StyleSheet.create({
         padding: 10
     },
     subjectCard: {
-        padding: 20,
+        marginBottom: 15,
+        borderRadius: 10,
+        elevation: 3
+    },
+    subjectContent: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
-    subjectSubjectCard: {
-        flex: 4,
-        fontSize: 15,
+    subjectText: {
+        fontSize: 20,
+        color: '#1c1c1e',
     },
-    creditsSubjectCard: {
-        flex: 1,
-        fontSize: 15,
-        textAlign: 'center'
+    subjectCode: {
+        fontSize: 16,
+        color: '#666',
     },
     averageCard: {
         flexDirection: 'row',

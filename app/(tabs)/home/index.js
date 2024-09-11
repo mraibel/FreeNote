@@ -13,15 +13,18 @@ export default function Home() {
     const { logout, setAuthState, authState } = useAuth()
     const router = useRouter()
 
-    const { data, setData } = useData()
+    const { data, setData, setSemesters } = useData()
 
     useEffect(() => {
+        console.log('home1')
         getItem('id').then((id) => {
             const idParse = parseInt(id)
-            console.log('home')
+            console.log('homeee')
             getAllDataById(idParse).then((data) => {
+                console.log(data)
                 setData(data)
-            }) 
+                setSemesters(data.semesters)
+            }).catch((e) => console.log(e))
         })
     }, [])
 

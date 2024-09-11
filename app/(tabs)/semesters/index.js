@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View, StyleSheet, FlatList } from "react-native";
 import { Link } from "expo-router";
 import GradientBackground from "../../../components/GradienteBackground/GradientBackground";
@@ -6,13 +5,7 @@ import { useData } from "../../../components/Data/DataContext";
 
 export default function Index() {
 
-    const [semesters, setSemesters] = useState(null)
-
-    const { data } = useData()
-    
-    useEffect(() => {
-        setSemesters(data.semesters)
-    }, [])
+    const { semesters, setCurrentSemester } = useData()
 
     if (semesters == null) {
         return (
@@ -44,7 +37,7 @@ export default function Index() {
                 {
                     <FlatList
                         data={semesters}
-                        renderItem={({ item }) => <SemesterCard name={item.name} id={item.id}/>}
+                        renderItem={({ item }) => <SemesterCard name={item.name} id={item.id} semester={item} setSemester={setCurrentSemester}/>}
                         keyExtractor={item => item.id}
                         ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
                     />
@@ -54,9 +47,18 @@ export default function Index() {
     }
 }
 
-const SemesterCard = ({ name, id }) => {
+const SemesterCard = ({ name, id, semester, setSemester }) => {
+
+    function setCurrentSemester(){
+        setSemester(semester)
+    }
+
     return (
-        <Link href={`/semesters/semester/${id}`} asChild>
+        <Link
+            href={`/semesters/semester/${id}`}
+            asChild
+            onPress={setCurrentSemester}
+        >
             <Pressable>
                 <GradientBackground style={styles.semesterCard}>
                     <Text style={styles.textSemesterCard}> {name} </Text>
@@ -87,7 +89,8 @@ const styles = StyleSheet.create({
         padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 15
+        borderRadius: 15,
+        elevation: 3
     },
     textSemesterCard: {
         fontSize: 18,
