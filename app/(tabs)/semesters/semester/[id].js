@@ -1,18 +1,25 @@
-import { Link } from "expo-router"
+import { Link, useLocalSearchParams } from "expo-router"
 import { useEffect, useState } from "react"
 import { ActivityIndicator, Text, View, FlatList, StyleSheet } from "react-native";
 import { semesterAverage } from '../../../../utils/semesterAverage'
-import { useData } from "../../../../components/Data/DataContext";
 import { Card, Button, IconButton } from "react-native-paper";
+import { getSemesterId } from "../../../../lib/semesters";
+import { useData } from "../../../../components/Data/DataContext";
 
 export default function SemestreId() {
 
+    // Params
+    const { id } = useLocalSearchParams()
+
     // Data
     const [ subjects, setSubjects ] = useState(null)
-    const { currentSemester, setCurrentSubject } = useData()
+    const { setCurrentSubject } = useData()
 
     useEffect(() => {
-        setSubjects(currentSemester.subjects)
+        getSemesterId(id).then((semester) => {
+            console.log(semester.subjects)
+            setSubjects(semester.subjects)
+        })
     }, [])
 
     if (subjects === null) {

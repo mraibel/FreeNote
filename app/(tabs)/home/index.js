@@ -5,36 +5,37 @@ import { useData } from "../../../components/Data/DataContext";
 import { ActivityIndicator } from "react-native-paper";
 import { useAuth } from "../../../components/Auth/AuthContext";
 import { useEffect } from "react";
-import { getAllDataById } from "../../../components/Data/data";
 import { getItem } from "../../../utils/SecureStore/secureStore";
+import { getInitialDataById } from "../../../components/Data/data";
 
 export default function Home() {
 
-    const { logout, setAuthState, authState } = useAuth()
+    const { logout, setAuthState } = useAuth()
     const router = useRouter()
 
-    const { data, setData, setSemesters } = useData()
+    const { data, setSemesters, setEvents, setData } = useData()
 
     useEffect(() => {
         console.log('home1')
         getItem('id').then((id) => {
             const idParse = parseInt(id)
             console.log('homeee')
-            getAllDataById(idParse).then((data) => {
-                console.log(data)
-                setData(data)
-                setSemesters(data.semesters)
-            }).catch((e) => console.log(e))
+            getInitialDataById(idParse).then((initialData) => {
+                // Set inital data
+                setData(initialData)
+                // Set Semesters
+                setSemesters(initialData.semesters)
+                // Set Events
+                setEvents(initialData.events)
+            })
         })
     }, [])
 
     if (data == null) {
         return (
-            <>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <ActivityIndicator size={100} color={'orange'} />
-                </View>
-            </>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+                <ActivityIndicator size={100} color={'orange'} />
+            </View>
         )
     }
 

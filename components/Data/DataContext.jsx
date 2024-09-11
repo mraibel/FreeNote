@@ -10,18 +10,22 @@ export const DataProvider = ({ children }) => {
     
     const [data, setData] = useState(null)
     const [semesters, setSemesters] = useState(null)
-    const [currentSemester, setCurrentSemester] = useState(null)
+    const [events, setEvents] = useState(null)
+
+    // currentSubject management
     const [currentSubject, setCurrentSubject] = useState(null)
 
     const value = {
+        // Data management
         data,
         setData,
+        // Semesters management
         semesters,
         setSemesters,
-        //
-        currentSemester,
-        setCurrentSemester,
-        //
+        // Events management
+        events,
+        setEvents,
+        // currentSubject management
         currentSubject,
         setCurrentSubject
     }

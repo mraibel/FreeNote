@@ -7,13 +7,11 @@ import { useData } from "../../../../../components/Data/DataContext"
 
 export default function SubjectId() {
 
-    const { id, idSemester } = useLocalSearchParams()
     const [subject, setSubject] = useState(null)
 
     const { currentSubject } = useData()
     
     useEffect(() => {
-        console.log(id, idSemester)
         setSubject(currentSubject)
     }, [] )
 

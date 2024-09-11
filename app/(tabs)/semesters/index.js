@@ -5,7 +5,7 @@ import { useData } from "../../../components/Data/DataContext";
 
 export default function Index() {
 
-    const { semesters, setCurrentSemester } = useData()
+    const { semesters } = useData()
 
     if (semesters == null) {
         return (
@@ -37,7 +37,7 @@ export default function Index() {
                 {
                     <FlatList
                         data={semesters}
-                        renderItem={({ item }) => <SemesterCard name={item.name} id={item.id} semester={item} setSemester={setCurrentSemester}/>}
+                        renderItem={({ item }) => <SemesterCard name={item.name} id={item.id}/>}
                         keyExtractor={item => item.id}
                         ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
                     />
@@ -47,17 +47,12 @@ export default function Index() {
     }
 }
 
-const SemesterCard = ({ name, id, semester, setSemester }) => {
-
-    function setCurrentSemester(){
-        setSemester(semester)
-    }
+const SemesterCard = ({ name, id }) => {
 
     return (
         <Link
             href={`/semesters/semester/${id}`}
             asChild
-            onPress={setCurrentSemester}
         >
             <Pressable>
                 <GradientBackground style={styles.semesterCard}>
