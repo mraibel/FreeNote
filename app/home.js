@@ -109,7 +109,6 @@ function FastCalendar({ events }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#FF8C00',
     },
     container: {
         flex: 1,

@@ -1,11 +1,19 @@
-import { ActivityIndicator, Pressable, Text, View, StyleSheet, FlatList } from "react-native";
-import { Link } from "expo-router";
+import { ActivityIndicator, Pressable, Text, View, StyleSheet, FlatList, SafeAreaView } from "react-native";
+import { Link, useRouter } from "expo-router";
 import GradientBackground from "../../../components/GradienteBackground/GradientBackground";
 import { useData } from "../../../components/Data/DataContext";
+import { LinearGradient } from "expo-linear-gradient";
+import { Calendar, ChevronRight } from "lucide-react-native";
 
 export default function Index() {
 
     const { semesters } = useData()
+
+    // router
+    const router = useRouter()
+    const navto = (route) => {
+        router.navigate(route)
+    }
 
     if (semesters == null) {
         return (
@@ -33,35 +41,33 @@ export default function Index() {
 
     if (semesters.length > 0) {
         return (
-            <View style={{ flex: 1, alignItems: 'center', paddingVertical: 50 }}>
-                {
+            <SafeAreaView style={styles.safeArea}>
+                <LinearGradient colors={['#FF8C00', '#FFA500', '#FFD700']} style={styles.container}>
                     <FlatList
                         data={semesters}
-                        renderItem={({ item }) => <SemesterCard name={item.name} id={item.id}/>}
+                        renderItem={({ item }) => <SemesterItem item={item} navTo={navto}/>}
                         keyExtractor={item => item.id}
-                        ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                        contentContainerStyle={styles.listContent}
                     />
-                }
-            </View>
+                </LinearGradient>
+            </SafeAreaView>
         )
     }
 }
 
-const SemesterCard = ({ name, id }) => {
-
-    return (
-        <Link
-            href={`/semesters/semester/${id}`}
-            asChild
-        >
-            <Pressable>
-                <GradientBackground style={styles.semesterCard}>
-                    <Text style={styles.textSemesterCard}> {name} </Text>
-                </GradientBackground>
-            </Pressable>
-        </Link>
-    )
-}
+const SemesterItem = ({ item, navTo }) => (
+    <Pressable
+        onPress={() => navTo(`/semesters/semester/${item.id}`)}
+        style={styles.semesterItem}>
+        <View style={styles.semesterIcon}>
+            <Calendar size={24} color="#FFFFFF" />
+        </View>
+        <View style={styles.semesterInfo}>
+            <Text style={styles.semesterName}>{item.name}</Text>
+        </View>
+        <ChevronRight size={24} color="#FF8C00" />
+    </Pressable>
+);
 
 const styles = StyleSheet.create({
     noSemesters: {
@@ -77,17 +83,55 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: 'semibold'
     },
-    semesterCard: {
-        backgroundColor: 'red',
-        width: 300,
-        height: 70,
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 15,
-        elevation: 3
+    safeArea: {
+        flex: 1,
     },
-    textSemesterCard: {
-        fontSize: 18,
-    }
+    container: {
+        flex: 1,
+    },
+    header: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+    },
+    listContent: {
+        padding: 20,
+        marginTop: 15
+    },
+    semesterItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: 12,
+        marginBottom: 12,
+        padding: 16,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+    },
+    semesterIcon: {
+        backgroundColor: '#FF7F50',
+        borderRadius: 8,
+        padding: 8,
+        marginRight: 12,
+    },
+    semesterInfo: {
+        flex: 1,
+    },
+    semesterName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    semesterDate: {
+        fontSize: 14,
+        color: '#666',
+        marginTop: 4,
+    },
 })
