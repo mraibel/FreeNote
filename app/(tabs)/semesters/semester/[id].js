@@ -17,7 +17,7 @@ export default function SemestreId() {
 
     useEffect(() => {
         getSemesterId(id).then((semester) => {
-            console.log(semester.subjects)
+            console.log(semester.subjects[0].grades)
             setSubjects(semester.subjects)
         })
     }, [])

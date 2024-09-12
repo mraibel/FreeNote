@@ -14,7 +14,7 @@ export const subjectAverage = (grades) => {
     return promedio.toFixed(1)
 }
 
-const subGradeAverage = (subgrades) => {
+export const subGradeAverage = (subgrades) => {
     let promedio = 0
 
     subgrades.forEach((e) => {
