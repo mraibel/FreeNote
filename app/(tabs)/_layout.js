@@ -1,37 +1,22 @@
-import { Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router";
 import { View } from "react-native";
 import { TabIconFontAwesome5, TabIconCommunityIcons } from "../../components/icons/TabIcon";
-import { DataProvider } from "../../components/Data/DataContext";
-
+import { House } from "lucide-react-native";
 
 export default function layout() {
     return (
-        <DataProvider>
-            <TabLayout/>        
-        </DataProvider>
-    )
-}
-
-function TabLayout() {
-    return (
         <View style={{ flex:1 }}>
             <Tabs
-                initialRouteName="home"
                 screenOptions={{
-                    headerShown: false,
-                    tabBarHideOnKeyboard:true
+                    tabBarHideOnKeyboard:true,
+                    headerStyle:{backgroundColor:'#F28911'},
+                    headerRight: () => (
+                        <Link href={'/home'} asChild>
+                            <House size={25} color={'black'} style={{margin:25}}/>
+                        </Link>
+                    )
                 }}
             >
-                <Tabs.Screen
-                    name="home"
-                    options={{
-                        title: 'Inicio',
-                        tabBarIcon: ({ focused }) => (
-                            <TabIconFontAwesome5 name={"home"} color={focused ? "orange" : "black"}/>
-                        )
-                    }}
-                />
-
                 <Tabs.Screen
                     name="semesters"
                     options={{
@@ -41,7 +26,6 @@ function TabLayout() {
                         )
                     }}
                 />
-
                 <Tabs.Screen
                     name="calendar"
                     options={{

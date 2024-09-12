@@ -1,18 +1,14 @@
 import { Link, useRouter } from "expo-router";
-import { View, StyleSheet, Text, Image, Pressable, ScrollView, SafeAreaView } from "react-native";
-import { useData } from "../../../components/Data/DataContext";
+import { View, StyleSheet, Text, Pressable, ScrollView, SafeAreaView } from "react-native";
+import { useData } from "../components/Data/DataContext";
 import { ActivityIndicator } from "react-native-paper";
-import { useAuth } from "../../../components/Auth/AuthContext";
 import { useEffect } from "react";
-import { getItem } from "../../../utils/SecureStore/secureStore";
-import { getInitialDataById } from "../../../components/Data/data";
+import { getItem } from "../utils/SecureStore/secureStore";
+import { getInitialDataById } from "../components/Data/data";
 import { LinearGradient } from "expo-linear-gradient";
 import { Bell, BookOpen, Calendar, UserCircle, Users } from "lucide-react-native";
 
 export default function Home() {
-
-    const { logout, setAuthState } = useAuth()
-    const router = useRouter()
 
     const { data, setSemesters, setEvents, setData } = useData()
 
@@ -21,6 +17,12 @@ export default function Home() {
         { id: 2, title: 'Entrega de Proyecto', date: '2023-06-18' },
         { id: 3, title: 'Conferencia de Ciencias', date: '2023-06-20' },
     ]
+
+    // router
+    const router = useRouter()
+    const navto = (route) => {
+        router.navigate(route)
+    }
 
     useEffect(() => {
         console.log('home1')
@@ -59,40 +61,29 @@ export default function Home() {
                     </View>
 
                     <View style={styles.buttonGrid}>
-                        <Pressable style={[styles.button, { backgroundColor: '#FF7F50' }]}>
+                        <Pressable
+                            onPress={() => navto('/semesters')}
+                            style={[styles.button, { backgroundColor: '#FF7F50' }]}>
                             <BookOpen size={32} color="#FFFFFF" />
                             <Text style={styles.buttonText}>Último semestre visto</Text>
                         </Pressable>
-                        <Pressable style={[styles.button, { backgroundColor: '#FFA07A' }]}>
+                        <Pressable
+                            onPress={() => navto('/semesters')}
+                            style={[styles.button, { backgroundColor: '#FFA07A' }]}>
                             <Calendar size={32} color="#FFFFFF" />
                             <Text style={styles.buttonText}>Ver semestres</Text>
                         </Pressable>
-                        <Pressable style={[styles.button, { backgroundColor: '#FF6347' }]}>
+                        <Pressable
+                            onPress={() => navto('/calendar')}
+                            style={[styles.button, { backgroundColor: '#FF6347' }]}>
                             <Users size={32} color="#FFFFFF" />
                             <Text style={styles.buttonText}>Eventos</Text>
                         </Pressable>
-                        <Pressable style={[styles.button, { backgroundColor: '#FF4500' }]}>
-                            <Bell size={32} color="#FFFFFF" />
-                            <Text style={styles.buttonText}>Notificaciones</Text>
-                        </Pressable>
                     </View>
-
                     <FastCalendar events={events} />
                 </ScrollView>
             </LinearGradient>
         </SafeAreaView>
-    )
-}
-
-function OptionCard({ title, route, color }) {
-
-    return (
-        <Link href={route}>
-            <Pressable style={[styles.button, { backgroundColor: color }]}>
-                <BookOpen size={32} color={'white'} />
-                <Text style={styles.buttonText}>{title}</Text>
-            </Pressable>
-        </Link>
     )
 }
 
@@ -148,8 +139,10 @@ const styles = StyleSheet.create({
     buttonGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
+        columnGap:10,
         padding: 16,
+        marginTop:50
     },
     button: {
         width: '48%',
