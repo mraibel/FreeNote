@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { getSemesterId } from "../../lib/semesters";
 
 const DataContext = createContext()
 
@@ -13,7 +14,13 @@ export const DataProvider = ({ children }) => {
     const [events, setEvents] = useState(null)
 
     // currentSubject management
-    const [currentSubject, setCurrentSubject] = useState(null)
+    const [currentSemester, setCurrentSemester] = useState(null)
+
+    const refreshCurrentSemesterData = () => {
+        getSemesterId(currentSemester.id).then((semester) => {
+            setCurrentSemester(semester)
+        })
+    }
 
     const value = {
         // Data management
@@ -25,9 +32,10 @@ export const DataProvider = ({ children }) => {
         // Events management
         events,
         setEvents,
-        // currentSubject management
-        currentSubject,
-        setCurrentSubject
+        // currentSemester management
+        currentSemester,
+        setCurrentSemester,
+        refreshCurrentSemesterData
     }
 
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>

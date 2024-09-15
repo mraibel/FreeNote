@@ -8,19 +8,14 @@ import { useData } from "../../../../components/Data/DataContext";
 
 export default function SemestreId() {
 
-    // Params
-    const { id } = useLocalSearchParams()
-
     // Data
     const [ subjects, setSubjects ] = useState(null)
-    const { setCurrentSubject } = useData()
+
+    const { currentSemester } = useData()
 
     useEffect(() => {
-        getSemesterId(id).then((semester) => {
-            console.log(semester.subjects[0].grades)
-            setSubjects(semester.subjects)
-        })
-    }, [])
+        setSubjects(currentSemester.subjects)
+    }, [currentSemester])
 
     if (subjects === null) {
         return (
@@ -35,7 +30,7 @@ export default function SemestreId() {
             <View style={{ flex: 7, padding: 20 }}>
                 <FlatList
                     data={subjects}
-                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id} setSubject={setCurrentSubject} subject={item}/>}
+                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id}/>}
                     keyExtractor={item => item.id}
                 />
             </View>
@@ -52,11 +47,7 @@ export default function SemestreId() {
     )
 }
 
-const SubjectCard = ({ name, credits, id, setSubject, subject }) => {
-
-    function setCurrentSubject() {
-        setSubject(subject)
-    }
+const SubjectCard = ({ name, credits, id }) => {
 
     return (
         <Card style={styles.subjectCard}>
@@ -70,7 +61,6 @@ const SubjectCard = ({ name, credits, id, setSubject, subject }) => {
                 <Link
                     href={`/semesters/semester/subject/${id}`}
                     asChild
-                    onPress={setCurrentSubject}
                 >
                     <Button>
                         Ver Detalles

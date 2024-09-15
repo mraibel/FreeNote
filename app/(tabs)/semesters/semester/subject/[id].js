@@ -7,13 +7,19 @@ import { ChevronDown, ChevronUp, Minus, Plus, Save } from "lucide-react-native";
 import { Button, Modal, Portal, TextInput } from 'react-native-paper'
 import { insertGrade } from "../../../../../lib/grades";
 import { getGradesSubjectId } from "../../../../../lib/subject";
+import { useLocalSearchParams } from "expo-router";
 
 export default function SubjectId() {
+
+    // Params
+    const { id } = useLocalSearchParams()
 
     // Initial data
     const [subject, setSubject] = useState(null)
     const [grades, setGrades] = useState(null)
-    const { currentSubject } = useData()
+
+    // Data
+    const { currentSemester } = useData()
 
     // Average
     const [average, setAverage] = useState(0)
@@ -25,10 +31,10 @@ export default function SubjectId() {
     const containerStyle = { backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 20, maxHeight: '60%' }
 
     useEffect(() => {
-        setSubject(currentSubject)
-        setGrades(currentSubject.grades)
-        setAverage(subjectAverage(currentSubject.grades))
-    }, [])
+        setSubject(currentSemester.subjects.find((e) => e.id == id))
+        setGrades(currentSemester.subjects.find((e) => e.id == id).grades)
+        setAverage(subjectAverage(currentSemester.subjects.find((e) => e.id == id).grades))
+    }, [currentSemester])
 
     const updateGrade = (updatedGrade) => {
         const newGrades = grades.map(grade =>
@@ -152,8 +158,11 @@ const GradeItem = ({ grade, onToggleSubgrades, onUpdate }) => {
     );
 };
 
-const ModalCreateGrade = ({ visible, hideModal, containerStyle, grades, setGrades, subject, setSubject, setAverage }) => {
+const ModalCreateGrade = ({ visible, hideModal, containerStyle, grades, subject }) => {
 
+    const { refreshCurrentSemesterData } = useData()
+
+    // Iniciar arreglo de notas a guardar
     const [subGrades, setSubgrades] = useState([
         {
             id: 0,
@@ -163,6 +172,7 @@ const ModalCreateGrade = ({ visible, hideModal, containerStyle, grades, setGrade
         }
     ])
 
+    // Agrega nueva nota en el Modal
     const addSubgrade = () => {
         const subGrade = {
             id: subGrades.length,
@@ -173,8 +183,10 @@ const ModalCreateGrade = ({ visible, hideModal, containerStyle, grades, setGrade
         setSubgrades([...subGrades, subGrade])
     }
 
+    // Eliminar nota del Modal
     const deleteSubGrade = () => setSubgrades(subGrades.slice(0, -1))
 
+    // Actualiza los campos mientras se escribe
     const updateGrade = (updatedGrade) => {
         const newGrades = subGrades.map(subgrade =>
             subgrade.id === updatedGrade.id ? updatedGrade : subgrade
@@ -182,52 +194,60 @@ const ModalCreateGrade = ({ visible, hideModal, containerStyle, grades, setGrade
         setSubgrades(newGrades);
     };
 
+    // Guardar nota en la BD
     const saveGrade = () => {
+        // Inicia sumatoria de porcentajes
         let totalPercentage = 0
-        if(subGrades.length < 2) {
+
+        if (subGrades.length < 2) { // Si solo es una nota a guardar
 
             grades.map(grade => {
                 totalPercentage += grade.percentage
             })
             totalPercentage += subGrades[0].percentage
-            if(totalPercentage > 100) {
+            if (totalPercentage > 100) {
                 console.log(totalPercentage)
                 alert('El porcentaje no puede superar 100%')
                 return
             }
 
+            // Objeto para insert en BD
             const gradeToSave = new Object()
             gradeToSave.description = subGrades[0].description
             gradeToSave.value = subGrades[0].value
             gradeToSave.percentage = subGrades[0].percentage
             gradeToSave.id_subject = subject.id
 
+            // Inserta nota en BD
             insertGrade(gradeToSave).then(() => {
                 alert('Nota guardada')
-                getGradesSubjectId(subject.id).then((subject) => {
-                    setSubject(subject)
-                    setGrades(subject.grades)
-                    setAverage(subjectAverage(subject.grades))
-                    subGrades.splice(0, subGrades.length)
-                    addSubgrade()
-                    hideModal()
-                })
+                // Vaciar e inicar las notas del arreglo del modal
+                subGrades.splice(0, subGrades.length)
+                addSubgrade()
+                // Refresca los datos del semestre actual
+                refreshCurrentSemesterData()
+                // Cerrar ventana modal
+                hideModal()
             })
 
-
-        } else {
+        } else { // Si es que es mas de una nota, significa que es una nota con subnotas
             let sliceGrades = subGrades.slice(1)
             sliceGrades.map((subgrade) => {
                 totalPercentage += subgrade.percentage
             })
-            console.log(totalPercentage)
-            if(totalPercentage > 100) {
+
+            // Las subnotas no pueden superar el 100%
+            if (totalPercentage > 100) {
                 console.log(totalPercentage)
                 alert('El porcentaje no puede superar 100%')
                 return
             }
+
+            // El promedio de las subnotas es el valor de la nota MAIN
             const averageSubGrades = subGradeAverage(sliceGrades)
             subGrades[0].value = averageSubGrades
+
+
         }
     }
 
@@ -288,12 +308,12 @@ const NewGradeItem = ({ item, updateSubGrade, grades, index }) => {
                 {
                     grades.length > 1 && index == 0 ? '' : (
                         <TextInput
-                        style={[styles.inputNewGrade, { flex: 1 }]}
-                        label="Nota"
-                        keyboardType="numeric"
-                        value={item.value.toString()}
-                        onChangeText={(text) => updateSubGrade({ ...item, value: parseFloat(text) || 0 })}
-                    />
+                            style={[styles.inputNewGrade, { flex: 1 }]}
+                            label="Nota"
+                            keyboardType="numeric"
+                            value={item.value.toString()}
+                            onChangeText={(text) => updateSubGrade({ ...item, value: parseFloat(text) || 0 })}
+                        />
                     )
                 }
             </View>

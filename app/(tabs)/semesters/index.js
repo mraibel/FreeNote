@@ -4,15 +4,19 @@ import GradientBackground from "../../../components/GradienteBackground/Gradient
 import { useData } from "../../../components/Data/DataContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar, ChevronRight } from "lucide-react-native";
+import { getSemesterId } from "../../../lib/semesters";
 
 export default function Index() {
 
-    const { semesters } = useData()
+    const { semesters, setCurrentSemester } = useData()
 
     // router
     const router = useRouter()
-    const navto = (route) => {
-        router.navigate(route)
+    const navto = (id) => {
+        getSemesterId(id).then((semester) => {
+            setCurrentSemester(semester)
+            router.navigate(`/semesters/semester/${id}`)
+        })
     }
 
     if (semesters == null) {
@@ -57,7 +61,7 @@ export default function Index() {
 
 const SemesterItem = ({ item, navTo }) => (
     <Pressable
-        onPress={() => navTo(`/semesters/semester/${item.id}`)}
+        onPress={() => navTo(item.id)}
         style={styles.semesterItem}>
         <View style={styles.semesterIcon}>
             <Calendar size={24} color="#FFFFFF" />
