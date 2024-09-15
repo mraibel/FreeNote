@@ -1,15 +1,16 @@
-import { Link, useLocalSearchParams } from "expo-router"
+import { Link } from "expo-router"
 import { useEffect, useState } from "react"
-import { ActivityIndicator, Text, View, FlatList, StyleSheet } from "react-native";
+import { ActivityIndicator, Text, View, FlatList, StyleSheet, Pressable, SafeAreaView } from "react-native";
 import { semesterAverage } from '../../../../utils/semesterAverage'
-import { Card, Button, IconButton } from "react-native-paper";
-import { getSemesterId } from "../../../../lib/semesters";
 import { useData } from "../../../../components/Data/DataContext";
+import { Book, ChevronRight } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { subjectAverage } from "../../../../utils/subjectAverage";
 
 export default function SemestreId() {
 
     // Data
-    const [ subjects, setSubjects ] = useState(null)
+    const [subjects, setSubjects] = useState(null)
 
     const { currentSemester } = useData()
 
@@ -26,102 +27,115 @@ export default function SemestreId() {
     }
 
     return (
-        <View style={styles.layout}>
-            <View style={{ flex: 7, padding: 20 }}>
+        <SafeAreaView style={styles.safeArea}>
+            <LinearGradient colors={['#FF8C00', '#FFA500', '#FFD700']} style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.semesterName}>{currentSemester.name}</Text>
+                </View>
                 <FlatList
                     data={subjects}
-                    renderItem={({ item }) => <SubjectCard name={item.name} credits={item.credits} id={item.id}/>}
+                    renderItem={({ item }) => (
+                        <SubjectItem subject={item} />
+                    )}
                     keyExtractor={item => item.id}
+                    contentContainerStyle={styles.listContent}
                 />
-            </View>
-            {
-                subjects.length > 0 ? (
-                    <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:20}}>
-                    {
-                        subjects ? <AverageCard average={semesterAverage(subjects)} /> : <ActivityIndicator color={'orange'} />
-                    }
+                <View style={styles.averageContainer}>
+                    <Text style={styles.averageText}>Promedio del Semestre</Text>
+                    <Text style={styles.averageValue}>{semesterAverage(subjects)}</Text>
                 </View>
-                ) : ''
-            }
-        </View>
-    )
+            </LinearGradient>
+        </SafeAreaView>
+    );
 }
 
-const SubjectCard = ({ name, credits, id }) => {
-
-    return (
-        <Card style={styles.subjectCard}>
-            <Card.Content>
-                <View style={styles.subjectContent}>
-                    <Text numberOfLines={1} style={styles.subjectText}>{name}</Text>
-                    <Text style={styles.subjectCode}>{credits}</Text>
-                </View>
-            </Card.Content>
-            <Card.Actions>
-                <Link
-                    href={`/semesters/semester/subject/${id}`}
-                    asChild
-                >
-                    <Button>
-                        Ver Detalles
-                    </Button>
-                </Link>
-                <IconButton
-                    icon="calendar"
-                    onPress={() => {/* Acción para agregar un evento de la asignatura */ }}
-                />
-            </Card.Actions>
-        </Card>
-    )
-}
-
-const AverageCard = ({ average }) => {
-    return (
-        <View style={styles.averageCard}>
-            <Text style={{ fontSize: 17 }}>Tu promedio este semestre es:</Text>
-            <View style={styles.squareAverageCard}>
-                <Text>{average}</Text>
+const SubjectItem = ({ subject }) => (
+    <Link
+        href={`/semesters/semester/subject/${subject.id}`}
+        asChild
+    >
+        <Pressable style={styles.subjectItem}>
+            <View style={styles.subjectIcon}>
+                <Book size={24} color="#FFFFFF" />
             </View>
-        </View>
-    )
-}
+            <View style={styles.subjectInfo}>
+                <Text numberOfLines={1} style={styles.subjectName}>{subject.name}</Text>
+                <Text style={styles.subjectGrade}>Promedio: {subjectAverage(subject.grades)}</Text>
+                <Text style={styles.subjectGrade}>Creditos: {subject.credits}</Text>
+            </View>
+            <ChevronRight size={24} color="#FF8C00" />
+        </Pressable>
+    </Link>
+)
 
 const styles = StyleSheet.create({
-    layout: {
+    safeArea: {
         flex: 1,
-        padding: 10
     },
-    subjectCard: {
-        marginBottom: 15,
-        borderRadius: 10,
-        elevation: 3
+    container: {
+        flex: 1,
     },
-    subjectContent: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    header: {
+        padding: 10,
         alignItems: 'center',
     },
-    subjectText: {
-        fontSize: 20,
-        color: '#1c1c1e',
+    semesterName: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'black'
     },
-    subjectCode: {
-        fontSize: 16,
+    listContent: {
+        padding: 16,
+    },
+    subjectItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: 12,
+        marginBottom: 12,
+        padding: 16,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+    },
+    subjectIcon: {
+        backgroundColor: '#FF7F50',
+        borderRadius: 8,
+        padding: 8,
+        marginRight: 12,
+    },
+    subjectInfo: {
+        flex: 1,
+    },
+    subjectName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    subjectGrade: {
+        fontSize: 14,
         color: '#666',
+        marginTop: 4,
     },
-    averageCard: {
-        flexDirection: 'row',
+    averageContainer: {
+        backgroundColor: '#FFFFFF',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 18,
         alignItems: 'center',
-        gap: 10
     },
-    squareAverageCard: {
-        padding: 5,
-        borderWidth: 1,
-        borderColor: 'gray',
-        width: 75,
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
-})
+    averageText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#FF8C00',
+    },
+    averageValue: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#FF8C00',
+        marginTop: 8,
+    },
+});
 
