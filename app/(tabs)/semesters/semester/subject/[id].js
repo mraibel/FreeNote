@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react"
-import { ActivityIndicator, FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native"
-import { subGradeAverage, subjectAverage } from "../../../../../utils/subjectAverage"
+import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native"
+import { subjectAverage } from "../../../../../utils/subjectAverage"
 import { useData } from "../../../../../components/Data/DataContext"
-import { LinearGradient } from "expo-linear-gradient";
-import { ChevronDown, ChevronUp, Minus, Plus, Save } from "lucide-react-native";
-import { Button, Modal, Portal, TextInput } from 'react-native-paper'
-import { insertGrade } from "../../../../../lib/grades";
-import { getGradesSubjectId } from "../../../../../lib/subject";
-import { useLocalSearchParams } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient"
+import { ChevronDown, ChevronUp, Ellipsis, Plus } from "lucide-react-native"
+import { Button, Divider, Menu, TextInput } from 'react-native-paper'
+import { useLocalSearchParams } from "expo-router"
+import { ModalCreateGrade } from "../../../../../components/Subject/ModalCreateGrade"
 
 export default function SubjectId() {
 
@@ -109,18 +108,33 @@ export default function SubjectId() {
 }
 
 const GradeItem = ({ grade, onToggleSubgrades, onUpdate }) => {
+
+    // Menu
+    const [visibleMenu, setVisibleMenu] = useState(false);
+    const openMenu = () => setVisibleMenu(true);
+    const closeMenu = () => setVisibleMenu(false);
+
     return (
         <View style={styles.gradeItem}>
             <View style={styles.gradeHeader}>
                 <Text style={styles.gradeName}>{grade.description}</Text>
-                {
-                    grade.subgrades && grade.subgrades.length > 0 ? (
-                        <Pressable onPress={onToggleSubgrades}>
-                            {grade.expanded ? <ChevronUp size={24} color="#FF8C00" /> : <ChevronDown size={24} color="#FF8C00" />}
-                        </Pressable>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                    {
+                        grade.subgrades && grade.subgrades.length > 0 ? (
+                            <Pressable onPress={onToggleSubgrades}>
+                                {grade.expanded ? <ChevronUp size={24} color="#FF8C00" /> : <ChevronDown size={24} color="#FF8C00" />}
+                            </Pressable>
 
-                    ) : ''
-                }
+                        ) : ''
+                    }
+                    <Menu
+                        visible={visibleMenu}
+                        onDismiss={closeMenu}
+                        anchor={<Ellipsis onPress={openMenu} size={24} color={'gray'} />}>
+                        <Menu.Item onPress={() => { }} title="Editar" />
+                        <Menu.Item onPress={() => { }} title="Eliminar" />
+                    </Menu>
+                </View>
             </View>
             <View style={styles.gradeInputs}>
                 <TextInput
@@ -135,7 +149,7 @@ const GradeItem = ({ grade, onToggleSubgrades, onUpdate }) => {
                     style={styles.input}
                     label="Nota"
                     keyboardType="numeric"
-                    value={grade.value.toString()}
+                    value={grade.value}
                     onChangeText={(text) => onUpdate({ ...grade, value: parseFloat(text) || 0 })}
                 />
             </View>
@@ -158,168 +172,6 @@ const GradeItem = ({ grade, onToggleSubgrades, onUpdate }) => {
     );
 };
 
-const ModalCreateGrade = ({ visible, hideModal, containerStyle, grades, subject }) => {
-
-    const { refreshCurrentSemesterData } = useData()
-
-    // Iniciar arreglo de notas a guardar
-    const [subGrades, setSubgrades] = useState([
-        {
-            id: 0,
-            description: '',
-            percentage: '',
-            value: ''
-        }
-    ])
-
-    // Agrega nueva nota en el Modal
-    const addSubgrade = () => {
-        const subGrade = {
-            id: subGrades.length,
-            description: '',
-            percentage: '',
-            value: ''
-        }
-        setSubgrades([...subGrades, subGrade])
-    }
-
-    // Eliminar nota del Modal
-    const deleteSubGrade = () => setSubgrades(subGrades.slice(0, -1))
-
-    // Actualiza los campos mientras se escribe
-    const updateGrade = (updatedGrade) => {
-        const newGrades = subGrades.map(subgrade =>
-            subgrade.id === updatedGrade.id ? updatedGrade : subgrade
-        )
-        setSubgrades(newGrades);
-    };
-
-    // Guardar nota en la BD
-    const saveGrade = () => {
-        // Inicia sumatoria de porcentajes
-        let totalPercentage = 0
-
-        if (subGrades.length < 2) { // Si solo es una nota a guardar
-
-            grades.map(grade => {
-                totalPercentage += grade.percentage
-            })
-            totalPercentage += subGrades[0].percentage
-            if (totalPercentage > 100) {
-                console.log(totalPercentage)
-                alert('El porcentaje no puede superar 100%')
-                return
-            }
-
-            // Objeto para insert en BD
-            const gradeToSave = new Object()
-            gradeToSave.description = subGrades[0].description
-            gradeToSave.value = subGrades[0].value
-            gradeToSave.percentage = subGrades[0].percentage
-            gradeToSave.id_subject = subject.id
-
-            // Inserta nota en BD
-            insertGrade(gradeToSave).then(() => {
-                alert('Nota guardada')
-                // Vaciar e inicar las notas del arreglo del modal
-                subGrades.splice(0, subGrades.length)
-                addSubgrade()
-                // Refresca los datos del semestre actual
-                refreshCurrentSemesterData()
-                // Cerrar ventana modal
-                hideModal()
-            })
-
-        } else { // Si es que es mas de una nota, significa que es una nota con subnotas
-            let sliceGrades = subGrades.slice(1)
-            sliceGrades.map((subgrade) => {
-                totalPercentage += subgrade.percentage
-            })
-
-            // Las subnotas no pueden superar el 100%
-            if (totalPercentage > 100) {
-                console.log(totalPercentage)
-                alert('El porcentaje no puede superar 100%')
-                return
-            }
-
-            // El promedio de las subnotas es el valor de la nota MAIN
-            const averageSubGrades = subGradeAverage(sliceGrades)
-            subGrades[0].value = averageSubGrades
-
-
-        }
-    }
-
-    return (
-        <Portal>
-            <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-                <Text style={{ fontSize: 25, textAlign: 'center' }}>Nueva Nota</Text>
-                <ScrollView style={{ marginVertical: 10 }}>
-                    {
-                        subGrades.map((subgrade, index) => (
-                            <NewGradeItem
-                                index={index}
-                                key={subgrade.id}
-                                item={subgrade}
-                                updateSubGrade={updateGrade}
-                                grades={subGrades}
-                            />
-                        ))
-                    }
-                </ScrollView>
-                <View style={{ flexDirection: 'row', columnGap: 10, justifyContent: 'center' }}>
-                    <Button onPress={addSubgrade} mode='contained' style={{ backgroundColor: '#FF8C00' }}>
-                        Sub Nota
-                    </Button>
-                    {
-                        subGrades.length > 1 ? (
-                            <Button onPress={deleteSubGrade} mode='contained' style={{ backgroundColor: '#FF8C00' }}>
-                                <Minus strokeWidth={4} size={20} color={'#FFFFFF'} />
-                            </Button>
-                        ) : ''
-                    }
-                    <Button mode='contained' onPress={saveGrade} style={{ backgroundColor: '#FF8C00' }}>
-                        Guardar nota
-                    </Button>
-                </View>
-            </Modal>
-        </Portal>
-    )
-}
-
-const NewGradeItem = ({ item, updateSubGrade, grades, index }) => {
-    return (
-        <View style={{ flex: 1, flexDirection: 'column', marginVertical: 5, rowGap: 3, width: 'full' }}>
-            <TextInput
-                style={styles.inputNewGrade}
-                label="Descripción"
-                value={item.description.toString()}
-                onChangeText={(text) => updateSubGrade({ ...item, description: text })}
-            />
-            <View style={{ flexDirection: 'row', columnGap: 3 }}>
-                <TextInput
-                    style={[styles.inputNewGrade, { flex: 1 }]}
-                    label="Porcentaje"
-                    keyboardType="numeric"
-                    value={item.percentage.toString()}
-                    onChangeText={(text) => updateSubGrade({ ...item, percentage: parseFloat(text) || 0 })}
-                />
-                {
-                    grades.length > 1 && index == 0 ? '' : (
-                        <TextInput
-                            style={[styles.inputNewGrade, { flex: 1 }]}
-                            label="Nota"
-                            keyboardType="numeric"
-                            value={item.value.toString()}
-                            onChangeText={(text) => updateSubGrade({ ...item, value: parseFloat(text) || 0 })}
-                        />
-                    )
-                }
-            </View>
-        </View>
-    )
-}
 
 const styles = StyleSheet.create({
     safeArea: {
