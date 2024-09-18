@@ -94,13 +94,9 @@ export default function SubjectId() {
                 </ScrollView>
                 <ModalCreateGrade
                     visible={visible}
-                    containerStyle={containerStyle}
                     hideModal={hideModal}
                     grades={grades}
-                    setGrades={setGrades}
                     subject={subject}
-                    setSubject={setSubject}
-                    setAverage={setAverage}
                 />
             </LinearGradient>
         </SafeAreaView>
