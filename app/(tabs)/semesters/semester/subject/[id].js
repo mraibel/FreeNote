@@ -4,9 +4,10 @@ import { subjectAverage } from "../../../../../utils/subjectAverage"
 import { useData } from "../../../../../components/Data/DataContext"
 import { LinearGradient } from "expo-linear-gradient"
 import { ChevronDown, ChevronUp, Ellipsis, Plus } from "lucide-react-native"
-import { Button, Divider, Menu, TextInput } from 'react-native-paper'
+import { Menu, TextInput } from 'react-native-paper'
 import { useLocalSearchParams } from "expo-router"
 import { ModalCreateGrade } from "../../../../../components/Subject/ModalCreateGrade"
+import { ModalDeleteGrade } from "../../../../../components/Subject/ModalDeleteGrade"
 
 export default function SubjectId() {
 
@@ -27,7 +28,6 @@ export default function SubjectId() {
     const [visible, setVisible] = useState(false);
     const showModal = () => setVisible(true);
     const hideModal = () => setVisible(false);
-    const containerStyle = { backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 20, maxHeight: '60%' }
 
     useEffect(() => {
         setSubject(currentSemester.subjects.find((e) => e.id == id))
@@ -110,8 +110,21 @@ const GradeItem = ({ grade, onToggleSubgrades, onUpdate }) => {
     const openMenu = () => setVisibleMenu(true);
     const closeMenu = () => setVisibleMenu(false);
 
+    // Modal Delete
+    const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
+    const showModal = () => {
+        setVisibleDeleteModal(true)
+        closeMenu()
+    }
+    const hideModal = () => setVisibleDeleteModal(false);
+
     return (
         <View style={styles.gradeItem}>
+            <ModalDeleteGrade 
+                visible={visibleDeleteModal}
+                hideDeleteModal={hideModal}
+                grade={grade}
+            />
             <View style={styles.gradeHeader}>
                 <Text style={styles.gradeName}>{grade.description}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
@@ -128,7 +141,7 @@ const GradeItem = ({ grade, onToggleSubgrades, onUpdate }) => {
                         onDismiss={closeMenu}
                         anchor={<Ellipsis onPress={openMenu} size={24} color={'gray'} />}>
                         <Menu.Item onPress={() => { }} title="Editar" />
-                        <Menu.Item onPress={() => { }} title="Eliminar" />
+                        <Menu.Item onPress={showModal} title="Eliminar" />
                     </Menu>
                 </View>
             </View>
@@ -145,7 +158,7 @@ const GradeItem = ({ grade, onToggleSubgrades, onUpdate }) => {
                     style={styles.input}
                     label="Nota"
                     keyboardType="numeric"
-                    value={grade.value}
+                    value={grade.value.toString()}
                     onChangeText={(text) => onUpdate({ ...grade, value: parseFloat(text) || 0 })}
                 />
             </View>

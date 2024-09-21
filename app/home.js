@@ -30,13 +30,14 @@ export default function Home() {
             const idParse = parseInt(id)
             console.log('homeee')
             getInitialDataById(idParse).then((initialData) => {
+                console.log(initialData)
                 // Set inital data
                 setData(initialData)
                 // Set Semesters
                 setSemesters(initialData.semesters)
                 // Set Events
                 setEvents(initialData.events)
-            })
+            }).catch((e) => console.log(e))
         })
     }, [])
 

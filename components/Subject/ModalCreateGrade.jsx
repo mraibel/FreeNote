@@ -23,8 +23,7 @@ export const ModalCreateGrade = ({ visible, hideModal, grades, subject }) => {
 
     const addNewGrade = () => {
         if (newGrade.description && newGrade.percentage) {
-            let sum = 0
-            let totalPercentage = grades.reduce((accumulator, e) => accumulator + e.percentage, sum)
+            let totalPercentage = grades.length > 0 ? grades.reduce((accumulator, e) => accumulator + e.percentage) : 0
             totalPercentage += newGrade.percentage
             if (totalPercentage > 100) {
                 Alert.alert('Error', 'La suma de los porcentajes no puede superar 100%');
@@ -48,17 +47,17 @@ export const ModalCreateGrade = ({ visible, hideModal, grades, subject }) => {
 
     const addSubgrade = () => {
         if (newGrade.description && newGrade.percentage) {
-            let sum = 0
-            let totalPercentage = newGrade.subgrades.reduce((accumulator, e) => accumulator + e.percentage, sum)
+            let totalPercentage =  grades.length > 0 ? grades.reduce((accumulator, e) => accumulator + e.percentage) : 0
             totalPercentage += newGrade.percentage
             if (totalPercentage > 100) {
+                console.log(totalPercentage)
                 Alert.alert('Error', 'La suma de los porcentajes no puede superar 100%');
                 return
             }
             const subgrade = {
                 id: Date.now(),
                 description: newGrade.description,
-                value: parseFloat(newGrade.value || 0),
+                value: newGrade.value ? parseFloat(newGrade.value) : 0,
                 percentage: parseFloat(newGrade.percentage),
             };
             setNewGrade({
